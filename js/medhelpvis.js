@@ -29,6 +29,7 @@ var initialBodyBackgroundColor = "black",
     posologyColor = "steelblue",
     posologyBackgroundColor = "#c7d9e8",
     periodColor = "#fd8d3c",
+    periodDashColor = "#9e4401",
     periodBackgroundColor = "#fedcc4",
     episodeColor = "#7f7f7f",
     episodeTextColor = "white",
@@ -47,6 +48,9 @@ var medicationInfo = [],
     sideEffects = [];
 
 var interactionsPresent = false;
+
+var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+var daysInMonths = [31,29,31,30,31,30,31,31,30,31,30,31];
 
 var svg = d3.select("body")
     .append("svg")
@@ -236,8 +240,8 @@ function initMedications(json) {
         med.leftDown.x = (med.leftDown.x - x0) * wMul;
         med.leftDown.y = (med.leftDown.y - y0) * hMul;
 
-        med.center = locationToMedCenter(med);
         med.circles = 0;
+        med.center = locationToMedCenter(med);
     });
 }
 
@@ -365,6 +369,7 @@ function visualizePersonal() {
     createTextInBar(bar,textFunction);
 }
 
+var interactions = [];
 function visualizeInteractions() {
     // find interactions
     for (var i = 0; i < pMedications.length; i++) {
@@ -373,7 +378,7 @@ function visualizeInteractions() {
             for (var k = 0; k < pMedications.length; k++) {
                 if (m.interactions[j] === pMedications[k].name) {
                     interactionsPresent = true;
-                    // interaction found
+                    //interactions.push({from: , to: })
                     drawArrowFromTo(pMedications[i], pMedications[k], false, interactionColor);
                 }
             }
@@ -448,7 +453,7 @@ function interceptOnCircle(p1,p2, o1,o2){
     var points = [];
     pMedications.forEach(function(med) {
         var c = med.center;
-        var r = (getInnerSize(med)/2) + (10 * (rWidth + rBuffer));
+        var r = (getInnerSize(med)/2) + (15 * (rWidth + rBuffer));
         var circle = new C(new V(c.x, c.y), (r-1)); // not the two original circles
         var polygon = new P(new V(0,0), [new V(p1.x,p1.y),new V(p2.x,p2.y)]);
         var response = new SAT.Response();
@@ -670,159 +675,263 @@ function visualizeMedications() {
         return new Date(day.toString("yyyy"), +(day.toString("M")), 0).getDate()
     }
 
+
     /**
      * init all posology arc on the selected circle
-     * @param medBox
-     * @param medInfo
      */
     function initPeriods(medBox, medInfo) {
-        createCircle(medBox, getInnerSize(medBox)/2 + rWidth + rBuffer, periodBackgroundColor);
+        var medSvg = d3.select("#" + medBox.name);
 
         var startDate = Date.parse(medInfo.startDate);
         var endDate = Date.parse(medInfo.endDate);
-
-        var nbMonths = (+(endDate.toString('M')) - +(startDate.toString('M'))) + 1;
-        var angle = τ / (new Date(startDate.getYear(), +(startDate.toString('M')), 0).getDate());
+        var startMonthNumber = +(startDate.toString('M'));
+        var endMonthNumber = +(endDate.toString('M'));
         var startWeekDay = medInfo.weekday !== undefined && eval("startDate.next()." + medInfo.weekday + "()");
+        var nbMonths = endMonthNumber - startMonthNumber + 1;
+        if(nbMonths < 0) {
+            nbMonths = 12 - startMonthNumber + endMonthNumber + 1;
+        }
 
-        if (nbMonths === 1) {
-            var innerRadius = getInnerSize(medBox)/2 + rWidth + rBuffer;
-            createCircle(
-                medBox,
-                innerRadius,
-                periodBackgroundColor
-            );
-            if (!startWeekDay) {
-                createPosArc(
-                    medBox,
-                    innerRadius,
-                    startDate.getDate() * angle,
-                    (endDate.getDate()+1) * angle,
-                    periodColor
-                );
-            } else {
-                var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
-                for (var j = 0; j < nbWeeks; j++) {
-                    createPosArc(
-                        medBox,
-                        innerRadius,
-                        startWeekDay.getDate() * angle,
-                        (startWeekDay.getDate() + 1) * angle,
-                        periodColor
-                    );
-                    startWeekDay.addWeeks(1);
-                }
-            }
-            var daysInThisMonth = daysInMonth(startDate);
-            for(var i = 0; i < daysInThisMonth; i++) {
-                createPosArc(medBox,
-                    innerRadius,
-                    ((i-0.01) / daysInThisMonth) * τ,
-                    ((i+0.01) / daysInThisMonth) * τ,
-                    periodColor);
-                d3.select("#" + medBox.name)
-                    .append("text")
-                    .attr("class", "auxtext")
-                    .attr("x", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.cos((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-                    .attr("y", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.sin((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-                    .attr("text-anchor", "middle")
-                    .style("fill", periodColor)
-                    .style("font-size", auxTextFont)
-                    .style("text-anchor", "middle")
-                    .attr("dy", ".3em")
-                    .style("stroke", bodyBackgroundColor)
-                    .style("stroke-width", textStrokeWidth)
-                    .style("stroke-linejoin", "round")
-                    .style("paint-order", "stroke")
-                    .text(i+1);
-            }
-        } else {
-            for (var i = 0; i < nbMonths - 1; i++) {
-                if (!startWeekDay) {
-                    createCircle(
-                        medBox,
-                        getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-                        periodColor);
+        console.log(nbMonths);
+        for(var i = 0; i < nbMonths; i++) {
+            var monthIndex = (startMonthNumber + i - 1)%12;
+            var innerRadius = getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer));
+            var path = d3.select("#" + medBox.name)
+                .append("path")
+                .attr("id", medBox.name + "-arcpath" + i)
+                .attr("class", "period_arc")
+                .style("fill", "none")
+                .attr("d", innerArc(innerRadius, -0.1*Math.PI,0)(medBox));
+
+            medSvg.append("text")
+                .attr("dy",rWidth/2 + 4)
+                .append("textPath") //append a textPath to the text element
+                .attr("xlink:href", "#" + medBox.name + "-arcpath"+i) //place the ID of the path here
+                .attr("text-anchor", "end")
+                .attr("startOffset", "42%")
+                .attr("fill", episodeTextColor)
+                .text(months[monthIndex]);
+
+            var daysInMonth = daysInMonths[monthIndex];
+            var endAngle = daysInMonth/31 * 1.9*Math.PI;
+            createPosArc(medBox,innerRadius, 0, endAngle,periodBackgroundColor);
+
+            if(!startWeekDay && i !== nbMonths-1) {
+                if(i === 0) {
+                    createPosArc(medBox,innerRadius, (startDate.getDate() / daysInMonth) * endAngle, endAngle,periodColor);
                 } else {
-                    createCircle(
-                        medBox,
-                        getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-                        periodBackgroundColor);
-                    for (var j = 0; j < 5; j++) {
-                        if (+(startWeekDay.toString('M')) === (new Date(medInfo.startDate).getMonth() + (i))) {
+                    createPosArc(medBox,innerRadius, 0, endAngle,periodColor);
+                }
+            } else {
+                if(!startWeekDay) {
+                    if(i === 0) {
+                        createPosArc(medBox,innerRadius, (startDate.getDate() / daysInMonth) * endAngle, (endDate.getDate() / daysInMonth) * endAngle, periodColor);
+                    } else {
+                        createPosArc(medBox,innerRadius, 0, (endDate.getDate() / daysInMonth) * endAngle, periodColor);
+                    }
+                } else {
+                   // TODO juiste vakjes kleuren
+                    createPosArc(medBox,innerRadius, 0, endAngle,periodBackgroundColor);
+                    for (var k = 0; k < 5; k++) {
+                        if (startWeekDay.between(startDate,endDate) && +(startWeekDay.toString('M')) === (startMonthNumber+i)) {
                             createPosArc(
                                 medBox,
-                                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-                                startWeekDay.getDate() * angle,
-                                (startWeekDay.getDate() + 1) * angle,
+                                innerRadius,
+                                ((startWeekDay.getDate() - 1) / daysInMonth) * endAngle,
+                                ((startWeekDay.getDate()) / daysInMonth) * endAngle,
                                 periodColor
                             );
                             startWeekDay.addWeeks(1);
                         }
                     }
                 }
-
-                var daysInThisMonth = daysInMonth(startWeekDay);
-                for(var j = 0; j < daysInThisMonth; j++) {
-                    createPosArc(medBox,
-                        getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-                        ((j-0.01) / daysInThisMonth) * τ,
-                        ((j+0.01) / daysInThisMonth) * τ,
-                        periodColor);
-                }
-
             }
-            // laatste maand
-            createCircle(
-                medBox,
-                getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
-                periodBackgroundColor
-            );
-            if (!startWeekDay) {
-                createPosArc(
-                    medBox,
-                    getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
-                    0,
-                    (endDate.getDate() + 1) * angle,
-                    periodColor
-                );
-            } else {
-                var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
-                for (var j = 0; j < nbWeeks; j++) {
-                    createPosArc(
-                        medBox,
-                        getInnerSize(medBox)/2 + ((nbMonths) * (rWidth + rBuffer)),
-                        (startWeekDay.getDate() - 1) * angle,
-                        ((startWeekDay.getDate() - 1) + 1) * angle,
-                        periodColor
-                    );
-                    startWeekDay.addWeeks(1);
-                }
-            }
-            var daysInThisMonth = daysInMonth(endDate)
-            for(var j = 0; j < daysInThisMonth; j++) {
+            for (var j = 0; j < daysInMonth; j++) {
                 createPosArc(medBox,
-                    getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-                    ((j-0.01) / daysInThisMonth) * τ,
-                    ((j+0.01) / daysInThisMonth) * τ,
-                    periodColor);
+                    innerRadius,
+                    ((j - 0.01) / daysInMonth) * endAngle,
+                    ((j + 0.01) / daysInMonth) * endAngle,
+                    periodDashColor);
 
-                d3.select("#" + medBox.name)
-                    .append("text")
-                    .attr("class", "auxtext")
-                    .attr("x", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.cos((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-                    .attr("y", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.sin((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-                    .style("fill", periodColor)
-                    .style("font-size", auxTextFont)
-                    .style("text-anchor", "middle")
-                    .attr("dy", ".3em")
-                    .style("stroke", bodyBackgroundColor)
-                    .style("stroke-width", textStrokeWidth)
-                    .style("stroke-linejoin", "round")
-                    .style("paint-order", "stroke")
-                    .text(j+1);
+                if (i == nbMonths - 1) {
+                    medSvg
+                        .append("text")
+                        .attr("class", "auxtext")
+                        .attr("x", (getInnerSize(medBox) / 2 + (i + 2.5) * (rWidth + rBuffer)) * -Math.cos((((j + 0.5) / daysInMonth) * endAngle) + Math.PI / 2))
+                        .attr("y", (getInnerSize(medBox) / 2 + (i + 2.5) * (rWidth + rBuffer)) * -Math.sin((((j + 0.5) / daysInMonth) * endAngle) + Math.PI / 2))
+                        .attr("text-anchor", "middle")
+                        .style("fill", periodColor)
+                        .style("font-size", auxTextFont)
+                        .style("text-anchor", "middle")
+                        .attr("dy", ".3em")
+                        .style("stroke", bodyBackgroundColor)
+                        .style("stroke-width", textStrokeWidth)
+                        .style("stroke-linejoin", "round")
+                        .style("paint-order", "stroke")
+                        .text(j + 1);
+                }
             }
         }
+        
+        // TODO data in orde maken en dan tutorial volgen --> animaties voor later
+        //var periodData = [];
+        //for(var i = 0; i < nbMonths; i++) {
+        //    periodData.push(
+        //        {
+        //            month: months[startMonthNumber + i - 1],
+        //            days: daysInMonth(startDate)
+        //        }
+        //    )
+        //}
+
+
+        //createCircle(medBox, getInnerSize(medBox)/2 + rWidth + rBuffer, periodBackgroundColor);
+        //
+        //var startDate = Date.parse(medInfo.startDate);
+        //var endDate = Date.parse(medInfo.endDate);
+        //
+        //var nbMonths = (+(endDate.toString('M')) - +(startDate.toString('M'))) + 1;
+        //var angle = τ / (new Date(startDate.getYear(), +(startDate.toString('M')), 0).getDate());
+        //var startWeekDay = medInfo.weekday !== undefined && eval("startDate.next()." + medInfo.weekday + "()");
+        //
+        //if (nbMonths === 1) {
+        //    var innerRadius = getInnerSize(medBox)/2 + rWidth + rBuffer;
+        //    createCircle(
+        //        medBox,
+        //        innerRadius,
+        //        periodBackgroundColor
+        //    );
+        //    if (!startWeekDay) {
+        //        createPosArc(
+        //            medBox,
+        //            innerRadius,
+        //            startDate.getDate() * angle,
+        //            (endDate.getDate()+1) * angle,
+        //            periodColor
+        //        );
+        //    } else {
+        //        var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
+        //        for (var j = 0; j < nbWeeks; j++) {
+        //            createPosArc(
+        //                medBox,
+        //                innerRadius,
+        //                startWeekDay.getDate() * angle,
+        //                (startWeekDay.getDate() + 1) * angle,
+        //                periodColor
+        //            );
+        //            startWeekDay.addWeeks(1);
+        //        }
+        //    }
+        //    var daysInThisMonth = daysInMonth(startDate);
+        //    for(var i = 0; i < daysInThisMonth; i++) {
+        //        createPosArc(medBox,
+        //            innerRadius,
+        //            ((i-0.01) / daysInThisMonth) * τ,
+        //            ((i+0.01) / daysInThisMonth) * τ,
+        //            periodColor);
+        //        d3.select("#" + medBox.name)
+        //            .append("text")
+        //            .attr("class", "auxtext")
+        //            .attr("x", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.cos((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
+        //            .attr("y", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.sin((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
+        //            .attr("text-anchor", "middle")
+        //            .style("fill", periodColor)
+        //            .style("font-size", auxTextFont)
+        //            .style("text-anchor", "middle")
+        //            .attr("dy", ".3em")
+        //            .style("stroke", bodyBackgroundColor)
+        //            .style("stroke-width", textStrokeWidth)
+        //            .style("stroke-linejoin", "round")
+        //            .style("paint-order", "stroke")
+        //            .text(i+1);
+        //    }
+        //} else {
+        //    for (var i = 0; i < nbMonths - 1; i++) {
+        //        if (!startWeekDay) {
+        //            createCircle(
+        //                medBox,
+        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
+        //                periodColor);
+        //        } else {
+        //            createCircle(
+        //                medBox,
+        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
+        //                periodBackgroundColor);
+        //            for (var j = 0; j < 5; j++) {
+        //                if (+(startWeekDay.toString('M')) === (new Date(medInfo.startDate).getMonth() + (i))) {
+        //                    createPosArc(
+        //                        medBox,
+        //                        getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
+        //                        startWeekDay.getDate() * angle,
+        //                        (startWeekDay.getDate() + 1) * angle,
+        //                        periodColor
+        //                    );
+        //                    startWeekDay.addWeeks(1);
+        //                }
+        //            }
+        //        }
+        //
+        //        var daysInThisMonth = daysInMonth(startWeekDay);
+        //        for(var j = 0; j < daysInThisMonth; j++) {
+        //            createPosArc(medBox,
+        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
+        //                ((j-0.01) / daysInThisMonth) * τ,
+        //                ((j+0.01) / daysInThisMonth) * τ,
+        //                periodColor);
+        //        }
+        //
+        //    }
+        //    // laatste maand
+        //    createCircle(
+        //        medBox,
+        //        getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
+        //        periodBackgroundColor
+        //    );
+        //    if (!startWeekDay) {
+        //        createPosArc(
+        //            medBox,
+        //            getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
+        //            0,
+        //            (endDate.getDate() + 1) * angle,
+        //            periodColor
+        //        );
+        //    } else {
+        //        var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
+        //        for (var j = 0; j < nbWeeks; j++) {
+        //            createPosArc(
+        //                medBox,
+        //                getInnerSize(medBox)/2 + ((nbMonths) * (rWidth + rBuffer)),
+        //                (startWeekDay.getDate() - 1) * angle,
+        //                ((startWeekDay.getDate() - 1) + 1) * angle,
+        //                periodColor
+        //            );
+        //            startWeekDay.addWeeks(1);
+        //        }
+        //    }
+        //    var daysInThisMonth = daysInMonth(endDate)
+        //    for(var j = 0; j < daysInThisMonth; j++) {
+        //        createPosArc(medBox,
+        //            getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
+        //            ((j-0.01) / daysInThisMonth) * τ,
+        //            ((j+0.01) / daysInThisMonth) * τ,
+        //            periodColor);
+        //
+        //        d3.select("#" + medBox.name)
+        //            .append("text")
+        //            .attr("class", "auxtext")
+        //            .attr("x", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.cos((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
+        //            .attr("y", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.sin((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
+        //            .style("fill", periodColor)
+        //            .style("font-size", auxTextFont)
+        //            .style("text-anchor", "middle")
+        //            .attr("dy", ".3em")
+        //            .style("stroke", bodyBackgroundColor)
+        //            .style("stroke-width", textStrokeWidth)
+        //            .style("stroke-linejoin", "round")
+        //            .style("paint-order", "stroke")
+        //            .text(j+1);
+        //    }
+        //}
     }
 
     /**

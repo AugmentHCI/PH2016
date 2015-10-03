@@ -1,0 +1,15 @@
+/*body, html, #wrapper {*/
+    /*/!*width: 100%;*!/*/
+    /*display: block;*/
+    /*height: 100%;*/
+/*}*/
+
+@page { size: landscape; }
+
+/*@media screen and (max-width:8.5in) { /!* resize your window until the event is triggered *!/*/
+    /*html { width:8.5in; }*/
+/*}*/
+
+#svg_layer {
+    width: 100%;
+}

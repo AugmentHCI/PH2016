@@ -1,0 +1,213 @@
+{
+  "name": "C_2406",
+  "birthdate": "1968-11-30",
+  "weight": "70",
+  "gender": "FEMALE",
+  "objects": [
+    {
+      "name": "acetylcysteine",
+      "pathName": "data/acetylcysteine.png",
+      "found": true,
+      "leftUp": {
+        "x": 1027,
+        "y": 65
+      },
+      "leftDown": {
+        "x": 1020,
+        "y": 246
+      },
+      "rightUp": {
+        "x": 1266,
+        "y": 85
+      },
+      "rightDown": {
+        "x": 1259,
+        "y": 256
+      }
+    },
+    {
+      "name": "amoxicilline",
+      "pathName": "data/amoxicilline.png",
+      "found": true,
+      "leftUp": {
+        "x": 1329,
+        "y": 788
+      },
+      "leftDown": {
+        "x": 1357,
+        "y": 895
+      },
+      "rightUp": {
+        "x": 1538,
+        "y": 779
+      },
+      "rightDown": {
+        "x": 1529,
+        "y": 917
+      }
+    },
+    {
+      "name": "aspirine",
+      "pathName": "data/aspirine.png",
+      "found": true,
+      "leftUp": {
+        "x": 504,
+        "y": 89
+      },
+      "leftDown": {
+        "x": 509,
+        "y": 195
+      },
+      "rightUp": {
+        "x": 696,
+        "y": 82
+      },
+      "rightDown": {
+        "x": 693,
+        "y": 191
+      }
+    },
+    {
+      "name": "colludul",
+      "pathName": "data/colludul.png",
+      "found": true,
+      "leftUp": {
+        "x": 1493,
+        "y": 351
+      },
+      "leftDown": {
+        "x": 1494,
+        "y": 622
+      },
+      "rightUp": {
+        "x": 1648,
+        "y": 358
+      },
+      "rightDown": {
+        "x": 1647,
+        "y": 606
+      }
+    },
+    {
+      "name": "dcure",
+      "pathName": "data/dcure.png",
+      "found": true,
+      "leftUp": {
+        "x": 439,
+        "y": 444
+      },
+      "leftDown": {
+        "x": 447,
+        "y": 580
+      },
+      "rightUp": {
+        "x": 605,
+        "y": 444
+      },
+      "rightDown": {
+        "x": 605,
+        "y": 573
+      }
+    },
+    {
+      "name": "dormiplant",
+      "pathName": "data/dormiplant.png",
+      "found": true,
+      "leftUp": {
+        "x": 896,
+        "y": 431
+      },
+      "leftDown": {
+        "x": 908,
+        "y": 575
+      },
+      "rightUp": {
+        "x": 1108,
+        "y": 411
+      },
+      "rightDown": {
+        "x": 1122,
+        "y": 554
+      }
+    },
+    {
+      "name": "ibuprofen",
+      "pathName": "data/ibuprofen.png",
+      "found": false
+    },
+    {
+      "name": "lysox",
+      "pathName": "data/lysox.png",
+      "found": true,
+      "leftUp": {
+        "x": 1465,
+        "y": 161
+      },
+      "leftDown": {
+        "x": 1472,
+        "y": 304
+      },
+      "rightUp": {
+        "x": 1672,
+        "y": 162
+      },
+      "rightDown": {
+        "x": 1677,
+        "y": 298
+      }
+    },
+    {
+      "name": "motilium",
+      "pathName": "data/motilium.png",
+      "found": true,
+      "leftUp": {
+        "x": 712,
+        "y": 750
+      },
+      "leftDown": {
+        "x": 696,
+        "y": 854
+      },
+      "rightUp": {
+        "x": 871,
+        "y": 740
+      },
+      "rightDown": {
+        "x": 893,
+        "y": 846
+      }
+    },
+    {
+      "name": "sinutab",
+      "pathName": "data/sinutab.png",
+      "found": true,
+      "leftUp": {
+        "x": 991,
+        "y": 730
+      },
+      "leftDown": {
+        "x": 989,
+        "y": 857
+      },
+      "rightUp": {
+        "x": 1181,
+        "y": 731
+      },
+      "rightDown": {
+        "x": 1188,
+        "y": 845
+      }
+    }
+  ],
+  "episodes": [
+    "rheumatoid arthritis",
+    "artrose",
+    "spondylitis ankylosans",
+    "inflammation",
+    "stiffness",
+    "headache",
+    "cold",
+    "nasal congestion"
+  ],
+  "errorType": "NONE"
+}

@@ -1,0 +1,119 @@
+{
+  "name": "C_2406",
+  "birthdate": "1968-11-30",
+  "weight":"70",
+  "gender": "FEMALE",
+  "objects": [
+    {
+      "pathName": "data/amoxicilline.png",
+      "name": "amoxicilline",
+      "found": true,
+      "leftUp": {
+        "x": 476,
+        "y": 471
+      },
+      "leftDown": {
+        "x": 472,
+        "y": 591
+      },
+      "rightUp": {
+        "x": 644,
+        "y": 479
+      },
+      "rightDown": {
+        "x": 643,
+        "y": 587
+      }
+    },
+    {
+      "pathName": "data/brinta.png",
+      "name": "brinta",
+      "found": false
+    },
+    {
+      "pathName": "data/ibuprofen.png",
+      "name": "ibuprofen",
+      "found": false
+    },
+    {
+      "pathName": "data/motilium.png",
+      "name": "motilium",
+      "found": false
+    },
+    {
+      "pathName": "data/nietjes.png",
+      "name": "nietjes",
+      "found": true,
+      "leftUp": {
+        "x": 365,
+        "y": 192
+      },
+      "leftDown": {
+        "x": 382,
+        "y": 285
+      },
+      "rightUp": {
+        "x": 515,
+        "y": 155
+      },
+      "rightDown": {
+        "x": 542,
+        "y": 228
+      }
+    },
+    {
+      "pathName": "data/plakband.png",
+      "name": "plakband",
+      "found": false
+    },
+    {
+      "pathName": "data/sinutab.png",
+      "name": "sinutab",
+      "found": true,
+      "leftUp": {
+        "x": 705,
+        "y": 300
+      },
+      "leftDown": {
+        "x": 700,
+        "y": 407
+      },
+      "rightUp": {
+        "x": 867,
+        "y": 291
+      },
+      "rightDown": {
+        "x": 889,
+        "y": 386
+      }
+    },
+    {
+      "pathName": "data/zoetjes.png",
+      "name": "zoetjes",
+      "found": true,
+      "leftUp": {
+        "x": 596,
+        "y": 127
+      },
+      "leftDown": {
+        "x": 606,
+        "y": 284
+      },
+      "rightUp": {
+        "x": 699,
+        "y": 143
+      },
+      "rightDown": {
+        "x": 734,
+        "y": 281
+      }
+    }
+  ],
+  "episodes": [
+    "headache",
+    "Neoplasm digestive system benign",
+    "Oesophagus disease",
+    "Stomach function disorder"
+  ],
+  "errorType": "NONE"
+}

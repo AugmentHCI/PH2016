@@ -1,0 +1,149 @@
+{
+  "name": "C_2406",
+  "birthdate": "1968-11-30",
+  "weight": "70",
+  "gender": "FEMALE",
+  "objects": [
+    {
+      "name": "acetylcysteine",
+      "pathName": "data/acetylcysteine.png",
+      "found": true,
+      "leftUp": {
+        "x": 1020,
+        "y": 784
+      },
+      "leftDown": {
+        "x": 1002,
+        "y": 971
+      },
+      "rightUp": {
+        "x": 1246,
+        "y": 831
+      },
+      "rightDown": {
+        "x": 1225,
+        "y": 988
+      }
+    },
+    {
+      "name": "amoxicilline",
+      "pathName": "data/amoxicilline.png",
+      "found": false
+    },
+    {
+      "name": "aspirine",
+      "pathName": "data/aspirine.png",
+      "found": true,
+      "leftUp": {
+        "x": 744,
+        "y": 397
+      },
+      "leftDown": {
+        "x": 744,
+        "y": 505
+      },
+      "rightUp": {
+        "x": 934,
+        "y": 395
+      },
+      "rightDown": {
+        "x": 932,
+        "y": 502
+      }
+    },
+    {
+      "name": "colludul",
+      "pathName": "data/colludul.png",
+      "found": true,
+      "leftUp": {
+        "x": 1391,
+        "y": 389
+      },
+      "leftDown": {
+        "x": 1400,
+        "y": 656
+      },
+      "rightUp": {
+        "x": 1549,
+        "y": 393
+      },
+      "rightDown": {
+        "x": 1549,
+        "y": 639
+      }
+    },
+    {
+      "name": "dcure",
+      "pathName": "data/dcure.png",
+      "found": false
+    },
+    {
+      "name": "dormiplant",
+      "pathName": "data/dormiplant.png",
+      "found": false
+    },
+    {
+      "name": "ibuprofen",
+      "pathName": "data/ibuprofen.png",
+      "found": false
+    },
+    {
+      "name": "lysox",
+      "pathName": "data/lysox.png",
+      "found": true,
+      "leftUp": {
+        "x": 1125,
+        "y": 89
+      },
+      "leftDown": {
+        "x": 1107,
+        "y": 230
+      },
+      "rightUp": {
+        "x": 1327,
+        "y": 115
+      },
+      "rightDown": {
+        "x": 1312,
+        "y": 254
+      }
+    },
+    {
+      "name": "motilium",
+      "pathName": "data/motilium.png",
+      "found": true,
+      "leftUp": {
+        "x": 346,
+        "y": 334
+      },
+      "leftDown": {
+        "x": 343,
+        "y": 434
+      },
+      "rightUp": {
+        "x": 510,
+        "y": 334
+      },
+      "rightDown": {
+        "x": 513,
+        "y": 435
+      }
+    },
+    {
+      "name": "sinutab",
+      "pathName": "data/sinutab.png",
+      "found": false
+    }
+  ],
+  "episodes": [
+    "rheumatoid arthritis",
+    "artrose",
+    "spondylitis ankylosans",
+    "inflammation",
+    "stiffness",
+    "headache",
+    "cold",
+    "nasal congestion"
+  ],
+  "errorType": "NONE"
+}

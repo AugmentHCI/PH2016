@@ -12,20 +12,20 @@ var width = window.innerWidth,
     height = window.innerHeight,
     τ = 2 * Math.PI,
     rWidth = 10,
-    sizeBuffer = 20,
+    sizeBuffer = 120,
     rBuffer = 4,
     rectFromX = 10,
     rectHeight = 18,
     rectWidth = 180,
     interactionLineWidth = 5,
-    sideEffectStart = 300;
+    sideEffectStart = 200;
 
 var auxTextFont = 14,
     textFont = 14,
     textStrokeWidth = "7px";
 
-var initialBodyBackgroundColor = "black",
-    dangerBackgroundColor = "black",// "#f3bbbb",
+var initialBodyBackgroundColor = "white",
+    dangerBackgroundColor ="black"// "#f3bbbb",
     posologyColor = "steelblue",
     posologyBackgroundColor = "#c7d9e8",
     periodColor = "#fd8d3c",
@@ -265,7 +265,7 @@ function initAuxRectangles() {
         .style("fill", "white")
         .style("fill-opacity", 0.2)
         .style("stroke-opacity", 0.9)
-        .style("stroke", episodeTextColor)
+        .style("stroke", episodeColor)
         .attr("id", function (d) {
             return d.type + "auxrect";
         });
@@ -281,7 +281,7 @@ function initAuxRectangles() {
         .attr("id", function (d) {
             return d.type + "auxtext";
         })
-        .style("fill", episodeTextColor)
+        .style("fill", episodeColor)
         .style("font-size", textFont + 2)
         .text(function (d) {
             return d.type;
@@ -691,6 +691,8 @@ function visualizeMedications() {
         if(nbMonths < 0) {
             nbMonths = 12 - startMonthNumber + endMonthNumber + 1;
         }
+
+        d3.select("#" + medBox.name + "-arcpath" + i).remove();
 
         console.log(nbMonths);
         for(var i = 0; i < nbMonths; i++) {

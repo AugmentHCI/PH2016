@@ -1,18 +1,18 @@
 [
   {
     "name": "sinutab",
-    "treats": ["cold", "nasal congestion"],
+    "treats": ["cold", "nasal congestion", "Oesophagus disease"],
     "maxDays": 5,
-    "startDate": "today",
-    "endDate": "2015-08-23",
+    "startDate": "2015-10-04",
+    "endDate": "2015-12-23",
     "posology": {
       "hoursInBetween": 4,
       "dailyAmount": 3,
       "completely": true
     },
     "sideEffects": ["nausea", "vomitting", "arrhythmia", "tiredness"],
-    "breastfeeding": false,
-    "pregnant": false,
+    "breastfeeding": true,
+    "pregnant": true,
     "drivingAllowed": true,
     "minAge": 12,
     "weight": 0,

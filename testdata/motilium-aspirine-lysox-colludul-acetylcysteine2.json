@@ -5,6 +5,27 @@
   "gender": "FEMALE",
   "objects": [
     {
+      "name": "acetylcysteine",
+      "pathName": "data/acetylcysteine.png",
+      "found": true,
+      "leftUp": {
+        "x": 1020,
+        "y": 784
+      },
+      "leftDown": {
+        "x": 1002,
+        "y": 971
+      },
+      "rightUp": {
+        "x": 1246,
+        "y": 831
+      },
+      "rightDown": {
+        "x": 1225,
+        "y": 988
+      }
+    },
+    {
       "name": "amoxicilline",
       "pathName": "data/amoxicilline.png",
       "found": false
@@ -14,19 +35,19 @@
       "pathName": "data/aspirine.png",
       "found": true,
       "leftUp": {
-        "x": 644,
+        "x": 744,
         "y": 397
       },
       "leftDown": {
-        "x": 644,
+        "x": 744,
         "y": 505
       },
       "rightUp": {
-        "x": 834,
+        "x": 934,
         "y": 395
       },
       "rightDown": {
-        "x": 832,
+        "x": 932,
         "y": 502
       }
     },
@@ -36,19 +57,19 @@
       "found": true,
       "leftUp": {
         "x": 1391,
-        "y": 589
+        "y": 389
       },
       "leftDown": {
         "x": 1400,
-        "y": 856
+        "y": 656
       },
       "rightUp": {
         "x": 1549,
-        "y": 593
+        "y": 393
       },
       "rightDown": {
         "x": 1549,
-        "y": 839
+        "y": 639
       }
     },
     {
@@ -71,20 +92,41 @@
       "pathName": "data/lysox.png",
       "found": true,
       "leftUp": {
-        "x": 1225,
-        "y": 189
+        "x": 1125,
+        "y": 89
       },
       "leftDown": {
-        "x": 1207,
-        "y": 330
+        "x": 1107,
+        "y": 230
       },
       "rightUp": {
-        "x": 1427,
-        "y": 215
+        "x": 1327,
+        "y": 115
       },
       "rightDown": {
-        "x": 1412,
-        "y": 354
+        "x": 1312,
+        "y": 254
+      }
+    },
+    {
+      "name": "motilium",
+      "pathName": "data/motilium.png",
+      "found": true,
+      "leftUp": {
+        "x": 346,
+        "y": 334
+      },
+      "leftDown": {
+        "x": 343,
+        "y": 434
+      },
+      "rightUp": {
+        "x": 510,
+        "y": 334
+      },
+      "rightDown": {
+        "x": 513,
+        "y": 435
       }
     },
     {

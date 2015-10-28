@@ -103,5 +103,10 @@
     "cold",
     "nasal congestion"
   ],
+  "allergies": [
+    "ampicillin",
+    "succinylcholine",
+    "atracurium"
+  ],
   "errorType": "NONE"
 }

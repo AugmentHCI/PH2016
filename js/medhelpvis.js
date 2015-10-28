@@ -42,15 +42,16 @@ var pMedications,
     pName,
     pGender,
     pAge,
-    pWeight;
+    pWeight,
+    pAllergies;
 
 var medicationInfo = [],
     sideEffects = [];
 
 var interactionsPresent = false;
 
-var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-var daysInMonths = [31,29,31,30,31,30,31,31,30,31,30,31];
+var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+var MONTH_NB_DAYS = [31,29,31,30,31,30,31,31,30,31,30,31];
 
 var svg = d3.select("body")
     .append("svg")
@@ -135,7 +136,9 @@ function update() {
 
         initEpisodes(json);
         initMedications(json);
-        initAuxRectangles();
+        initAllergies(json);
+
+        drawAuxRectangles();
 
         interactionsPresent = false;
         visualizeInteractions();
@@ -143,6 +146,7 @@ function update() {
 
         visualizeEpisodes();
         visualizeSideEffects();
+        visualizeAllergies();
         visualizePersonal();
 
         visualizeMedications();
@@ -153,6 +157,11 @@ function update() {
 update();
 setInterval(update,500);
 
+
+/*
+ * Layout
+ */
+
 function setBackgroundColor() {
     if (interactionsPresent) {
         bodyBackgroundColor = dangerBackgroundColor;
@@ -162,6 +171,124 @@ function setBackgroundColor() {
     }
     d3.select("body").style("background", bodyBackgroundColor);
 }
+
+function drawAuxRectangles() {
+    var auxData = [
+        {
+            type: "episodes",
+            y: rectHeight - rBuffer,
+            height: pEpisodes.length
+        },
+        {
+            type: "side-effects",
+            y: sideEffectStart + rectHeight - rBuffer,
+            height: sideEffects.length
+        },
+        {
+            type: "allergies",
+            y: height - (pAllergies.length+6+2) * (rectHeight + rBuffer) - rBuffer,
+            height: pAllergies.length
+        },
+        {
+            type: "personal-data",
+            y: height - 6 * (rectHeight + rBuffer) - rBuffer,
+            height: 5
+        }];
+
+    lowerLayer.selectAll(".auxrect").data(auxData).enter().append("rect")
+        .attr("class", "auxrect")
+        .attr("x", rectFromX - rectFromX / 2)
+        .attr("y", function (d) {
+            return d.y
+        })
+        .attr("width", rectWidth + rectFromX)
+        .attr("height", function (d) {
+            return d.height * (rectHeight + rBuffer) + rBuffer * 3;
+        })
+        .style("fill", "white")
+        .style("fill-opacity", 0.2)
+        .style("stroke-opacity", 0.9)
+        .style("stroke", episodeColor)
+        .attr("id", function (d) {
+            return d.type + "auxrect";
+        });
+
+    lowerLayer.selectAll(".auxtext").data(auxData).enter().append("text")
+        .attr("class", "auxtext")
+        .attr("dx", "1em")
+        .attr("dy", "0.9em")
+        .attr("x", rectFromX - rectFromX / 2)
+        .attr("y", function (d) {
+            return d.y - rectHeight;
+        })
+        .attr("id", function (d) {
+            return d.type + "auxtext";
+        })
+        .style("fill", episodeColor)
+        .style("font-size", textFont + 2)
+        .text(function (d) {
+            return d.type;
+        });
+}
+
+
+/*
+ * Init data
+ */
+function initMedications(json) {
+    pMedications = json.objects.filter(function (d) {
+        return d.found
+    });
+    pMedications.forEach(function(med) {
+        med.rightUp.x = (med.rightUp.x - x0) * wMul;
+        med.rightUp.y = (med.rightUp.y - y0) * hMul;
+        med.rightDown.x = (med.rightDown.x - x0) * wMul;
+        med.rightDown.y = (med.rightDown.y - y0) * hMul;
+        med.leftUp.x = (med.leftUp.x - x0) * wMul;
+        med.leftUp.y = (med.leftUp.y - y0) * hMul;
+        med.leftDown.x = (med.leftDown.x - x0) * wMul;
+        med.leftDown.y = (med.leftDown.y - y0) * hMul;
+
+        med.circles = 0;
+        med.center = locationToMedCenter(med);
+    });
+}
+
+function initEpisodes(json) {
+    // TODO preconditie dat sideeffects al zijn ingeladen
+    pEpisodes = [];
+    episodeAsSideEffects = [];
+    // remove doubles
+    var temp2 = [];
+    json.episodes.forEach(function(el){
+        var found = false;
+        sideEffects.forEach(function(sideEffect) {
+            if(sideEffect.name === el) {
+                found = true;
+            }
+        });
+        if(!found) temp2.push(el);
+    });
+
+    for (var i = 0; i < temp2.length; i++) {
+        var name = temp2[i];
+        var e = {name: name.replace("/", ""), location: {x: rectFromX, y: (i+1) * (rectHeight+rBuffer)}};
+        pEpisodes.push(e);
+    }
+}
+
+function initAllergies(json) {
+    pAllergies = [];
+    for (var i = 0; i < json.allergies.length; i++) {
+        var name = json.allergies[i];
+        var e = {name: name.replace("/", ""), location: {x: rectFromX, y: height - (6 + 2 + 1 + i) * (rectHeight+rBuffer) + rBuffer}};
+        pAllergies.push(e);
+    }
+}
+
+/*
+ * Visualize  elements
+ */
 
 function visualizeConnections() {
     pMedications.forEach(function (m) {
@@ -184,6 +311,13 @@ function visualizeConnections() {
             episodeAsSideEffects.forEach(function (p) {
                 if (p.name.indexOf(info.sideEffects[i]) > -1) {
                     drawArrowFromTo(m, p, true, negativeArrowColor);
+                }
+            });
+        }
+        for (var i = 0; i < info.allergies.length; i++) {
+            pAllergies.forEach(function (p) {
+                if (p.name.indexOf(info.allergies[i]) > -1) {
+                    drawArrowFromTo(m, p, false, interactionColor);
                 }
             });
         }
@@ -226,67 +360,9 @@ function visualizeConnections() {
     });
 }
 
-function initMedications(json) {
-    pMedications = json.objects.filter(function (d) {
-        return d.found
-    });
-    pMedications.forEach(function(med) {
-        med.rightUp.x = (med.rightUp.x - x0) * wMul;
-        med.rightUp.y = (med.rightUp.y - y0) * hMul;
-        med.rightDown.x = (med.rightDown.x - x0) * wMul;
-        med.rightDown.y = (med.rightDown.y - y0) * hMul;
-        med.leftUp.x = (med.leftUp.x - x0) * wMul;
-        med.leftUp.y = (med.leftUp.y - y0) * hMul;
-        med.leftDown.x = (med.leftDown.x - x0) * wMul;
-        med.leftDown.y = (med.leftDown.y - y0) * hMul;
 
-        med.circles = 0;
-        med.center = locationToMedCenter(med);
-    });
-}
 
-function initAuxRectangles() {
-    var auxData = [{type: "episodes", y: rectHeight - rBuffer, height: pEpisodes.length}, {
-        type: "side-effects",
-        y: sideEffectStart + rectHeight - rBuffer,
-        height: sideEffects.length
-    }, {type: "personal-data", y: height - 6 * (rectHeight + rBuffer) - rBuffer, height: 5}];
 
-    lowerLayer.selectAll(".auxrect").data(auxData).enter().append("rect")
-        .attr("class", "auxrect")
-        .attr("x", rectFromX - rectFromX / 2)
-        .attr("y", function (d) {
-            return d.y
-        })
-        .attr("width", rectWidth + rectFromX)
-        .attr("height", function (d) {
-            return d.height * (rectHeight + rBuffer) + rBuffer * 3;
-        })
-        .style("fill", "white")
-        .style("fill-opacity", 0.2)
-        .style("stroke-opacity", 0.9)
-        .style("stroke", episodeColor)
-        .attr("id", function (d) {
-            return d.type + "auxrect";
-        });
-
-    lowerLayer.selectAll(".auxtext").data(auxData).enter().append("text")
-        .attr("class", "auxtext")
-        .attr("dx", "1em")
-        .attr("dy", "0.9em")
-        .attr("x", rectFromX - rectFromX / 2)
-        .attr("y", function (d) {
-            return d.y - rectHeight;
-        })
-        .attr("id", function (d) {
-            return d.type + "auxtext";
-        })
-        .style("fill", episodeColor)
-        .style("font-size", textFont + 2)
-        .text(function (d) {
-            return d.type;
-        });
-}
 
 function createBar(bar) {
     bar.append("rect")
@@ -308,6 +384,24 @@ function createTextInBar(bar, textFunction) {
 function visualizeEpisodes() {
     var bar = upperLayer.selectAll(".episodes")
         .data(pEpisodes)
+        .enter().append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("class","episodes")
+        .attr("transform", function(d, i) {
+            return "translate(" + d.location.x + ", " + d.location.y + ")";
+        });
+
+    createBar(bar);
+    createTextInBar(bar, function(d) {
+        return d.name;
+    });
+}
+
+function visualizeAllergies() {
+    var bar = upperLayer.selectAll(".allergies")
+        .data(pAllergies)
         .enter().append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -369,7 +463,6 @@ function visualizePersonal() {
     createTextInBar(bar,textFunction);
 }
 
-var interactions = [];
 function visualizeInteractions() {
     // find interactions
     for (var i = 0; i < pMedications.length; i++) {
@@ -378,7 +471,6 @@ function visualizeInteractions() {
             for (var k = 0; k < pMedications.length; k++) {
                 if (m.interactions[j] === pMedications[k].name) {
                     interactionsPresent = true;
-                    //interactions.push({from: , to: })
                     drawArrowFromTo(pMedications[i], pMedications[k], false, interactionColor);
                 }
             }
@@ -386,28 +478,6 @@ function visualizeInteractions() {
     }
 }
 
-function initEpisodes(json) {
-    // TODO preconditie dat sideeffects al zijn ingeladen
-    pEpisodes = [];
-    episodeAsSideEffects = [];
-    // remove doubles
-    var temp2 = [];
-    json.episodes.forEach(function(el){
-        var found = false;
-        sideEffects.forEach(function(sideEffect) {
-            if(sideEffect.name === el) {
-                found = true;
-            }
-        });
-        if(!found) temp2.push(el);
-    });
-
-    for (var i = 0; i < temp2.length; i++) {
-        var name = temp2[i];
-        var e = {name: name.replace("/", ""), location: {x: rectFromX, y: (i+1) * (rectHeight+rBuffer)}};
-        pEpisodes.push(e);
-    }
-}
 
 
 function drawArrowFromTo(object0, object1, arrow, color) {
@@ -712,9 +782,9 @@ function visualizeMedications() {
                 .attr("text-anchor", "end")
                 .attr("startOffset", "42%")
                 .attr("fill", episodeTextColor)
-                .text(months[monthIndex]);
+                .text(MONTH_NAMES[monthIndex]);
 
-            var daysInMonth = daysInMonths[monthIndex];
+            var daysInMonth = MONTH_NB_DAYS[monthIndex];
             var endAngle = daysInMonth/31 * 1.9*Math.PI;
             createPosArc(medBox,innerRadius, 0, endAngle,periodBackgroundColor);
 
@@ -780,7 +850,7 @@ function visualizeMedications() {
         //for(var i = 0; i < nbMonths; i++) {
         //    periodData.push(
         //        {
-        //            month: months[startMonthNumber + i - 1],
+        //            month: MONTH_NAMES[startMonthNumber + i - 1],
         //            days: daysInMonth(startDate)
         //        }
         //    )

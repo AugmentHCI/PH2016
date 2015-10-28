@@ -220,7 +220,7 @@
     "minAge": 0,
     "weight": 0,
     "interactions" : ["acetylsalicylzuur","heparine"],
-    "allergies": ["asthma"]
+    "allergies": ["asthma", "ampicillin"]
   },
   {
     "name": "ibuprofen",
@@ -261,7 +261,7 @@
     "minAge": 12,
     "weight": 35,
     "interactions" : ["ketoconazole"],
-    "allergies": []
+    "allergies": ["ampicillin"]
   },
   {
     "name": "dormiplant",

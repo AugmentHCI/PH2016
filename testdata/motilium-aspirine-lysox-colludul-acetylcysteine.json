@@ -14,19 +14,19 @@
       "pathName": "data/aspirine.png",
       "found": true,
       "leftUp": {
-        "x": 644,
+        "x": 344,
         "y": 397
       },
       "leftDown": {
-        "x": 644,
+        "x": 344,
         "y": 505
       },
       "rightUp": {
-        "x": 834,
+        "x": 534,
         "y": 395
       },
       "rightDown": {
-        "x": 832,
+        "x": 532,
         "y": 502
       }
     },
@@ -71,19 +71,19 @@
       "pathName": "data/lysox.png",
       "found": true,
       "leftUp": {
-        "x": 1225,
+        "x": 1525,
         "y": 189
       },
       "leftDown": {
-        "x": 1207,
+        "x": 1507,
         "y": 330
       },
       "rightUp": {
-        "x": 1427,
+        "x": 1757,
         "y": 215
       },
       "rightDown": {
-        "x": 1412,
+        "x": 1712,
         "y": 354
       }
     },

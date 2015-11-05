@@ -14,7 +14,7 @@ var width = window.innerWidth,
     rWidth = 10,
     sizeBuffer = 120,
     rBuffer = 4,
-    rectFromX = 10,
+    rectFromX = width/2,
     rectHeight = 18,
     rectWidth = 180,
     interactionLineWidth = 5,
@@ -24,18 +24,35 @@ var auxTextFont = 14,
     textFont = 14,
     textStrokeWidth = "7px";
 
+//var initialBodyBackgroundColor = "white",
+//    dangerBackgroundColor ="black"// "#f3bbbb",
+//    posologyColor = "steelblue",
+//    posologyBackgroundColor = "#c7d9e8",
+//    periodColor = "#fd8d3c",
+//    periodDashColor = "#9e4401",
+//    periodBackgroundColor = "#fedcc4",
+//    episodeColor = "#7f7f7f",
+//    episodeTextColor = "white",
+//    interactionColor = "#d62728",
+//    arrowColor = "#ceb9e1",
+//    negativeArrowColor= "#9467bd",
+//    lifetimeColor = "#69d094",
+//    lifetimeBackgroundColor = "#c3ecd4";
+
 var initialBodyBackgroundColor = "white",
-    dangerBackgroundColor ="black"// "#f3bbbb",
-    posologyColor = "steelblue",
-    posologyBackgroundColor = "#c7d9e8",
-    periodColor = "#fd8d3c",
+    dangerBackgroundColor ="black"
+    posologyColor = "#a9aa1e",
+    posologyBackgroundColor = "#ebeb91",
+    periodColor = " #ff7f0e",
     periodDashColor = "#9e4401",
-    periodBackgroundColor = "#fedcc4",
+    periodBackgroundColor = "#ffbe84",
     episodeColor = "#7f7f7f",
     episodeTextColor = "white",
     interactionColor = "#d62728",
-    arrowColor = "#ceb9e1",
-    negativeArrowColor= "#9467bd";
+    arrowColor = "#1f77b4",
+    negativeArrowColor= "#9467bd",
+    lifetimeColor = "6fbd22",
+    lifetimeBackgroundColor = "#b7de90";
 
 var pMedications,
     pEpisodes,
@@ -50,8 +67,8 @@ var medicationInfo = [],
 
 var interactionsPresent = false;
 
-var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-var MONTH_NB_DAYS = [31,29,31,30,31,30,31,31,30,31,30,31];
+var MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Lifetime'];
+var MONTH_NB_DAYS = [31,29,31,30,31,30,31,31,30,31,30,31,31];
 
 var svg = d3.select("body")
     .append("svg")
@@ -96,28 +113,10 @@ svg.append("defs").append("marker")
 var lineFunction = d3.svg.line()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; })
-    .interpolate("basis");
+    .interpolate("basis"); // basis
 
 d3.json("testdata/medicationInfo.json", function(error, json) {
     medicationInfo = json;
-    var temp = [];
-    medicationInfo.forEach(function (info) {
-        temp = temp.concat(info.sideEffects);
-    });
-    // remove doubles
-    var temp2 = [];
-    temp.forEach(function(el){
-        if(temp2.indexOf(el) === -1) temp2.push(el);
-    });
-    for(var i = 1; i <= temp2.length; i++) {
-        var j = i + temp2.length;
-        sideEffects.push({
-            name: temp2[i-1],
-            location: {
-                x: rectFromX,
-                y: (i) * (rectHeight + rBuffer) + sideEffectStart
-        }});
-    }
 });
 
 function update() {
@@ -133,7 +132,7 @@ function update() {
         pGender = json.gender;
         pAge = new Date().getFullYear() - json.birthdate.substring(0,4);
         pWeight = +json.weight;
-
+        initSideEffects(json);
         initEpisodes(json);
         initMedications(json);
         initAllergies(json);
@@ -155,7 +154,7 @@ function update() {
 }
 
 update();
-setInterval(update,500);
+//setInterval(update,500);
 
 
 /*
@@ -197,15 +196,24 @@ function drawAuxRectangles() {
 
     lowerLayer.selectAll(".auxrect").data(auxData).enter().append("rect")
         .attr("class", "auxrect")
-        .attr("x", rectFromX - rectFromX / 2)
+        .attr("x", rectFromX - rBuffer - rectWidth/2)
         .attr("y", function (d) {
             return d.y
         })
-        .attr("width", rectWidth + rectFromX)
+        .attr("width", rectWidth + 2*rBuffer)
         .attr("height", function (d) {
             return d.height * (rectHeight + rBuffer) + rBuffer * 3;
         })
-        .style("fill", "white")
+        .style("fill", function (d) {
+            switch (d.type) {
+                case "episodes":
+                    return arrowColor;
+                case "side-effects":
+                    return negativeArrowColor;
+                default:
+                    return episodeColor;
+            };
+        })
         .style("fill-opacity", 0.2)
         .style("stroke-opacity", 0.9)
         .style("stroke", episodeColor)
@@ -217,14 +225,23 @@ function drawAuxRectangles() {
         .attr("class", "auxtext")
         .attr("dx", "1em")
         .attr("dy", "0.9em")
-        .attr("x", rectFromX - rectFromX / 2)
+        .attr("x", rectFromX - rBuffer - rectWidth/2)
         .attr("y", function (d) {
             return d.y - rectHeight;
         })
         .attr("id", function (d) {
             return d.type + "auxtext";
         })
-        .style("fill", episodeColor)
+        .style("fill", function (d) {
+            switch (d.type) {
+                case "episodes":
+                    return arrowColor;
+                case "side-effects":
+                    return negativeArrowColor;
+                default:
+                    return episodeColor;
+            };
+        })
         .style("font-size", textFont + 2)
         .text(function (d) {
             return d.type;
@@ -232,9 +249,77 @@ function drawAuxRectangles() {
 }
 
 
+function isMoreLikely(a, b) {
+    if(a == "zeer vaak") {
+        if(b == "zeer vaak") {
+            return false;
+        } else {
+            return true;
+        }
+    } else if (a == "vaak") {
+        if (b == "zeer vaak" || b == "vaak") {
+            return false;
+        } else {
+            return true;
+        }
+    } else if (a == "soms") {
+        if (b == "zeer vaak" || b == "vaak" || b == "soms") {
+            return false;
+        } else {
+            return true;
+        }
+    } else if (a == "zelden") {
+        if(b == "zelden") {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
 /*
  * Init data
  */
+function initSideEffects(json) {
+    medicationInfo = medicationInfo.filter(function (info) {
+        return json.objects.some(function (med) {
+            return med.found && med.name === info.name
+        })
+    });
+
+    var temp = [];
+    medicationInfo.forEach(function (info) {
+        temp = temp.concat(info.sideEffects);
+    });
+    // remove doubles
+    var temp2 = [];
+    temp.forEach(function (el) {
+        if(temp2.some(function(inf) {return el.name == inf.name;})){
+            temp2.forEach(function(el2) {
+                if(el.name == el2.name) {
+
+                    if (isMoreLikely(el.likelihood,el2.maxLikelihood)) {
+                        el2.maxLikelihood = el.likelihood;
+                    }
+                }
+            })
+        } else {
+            temp2.push({name: el.name, likelihood: el.likelihood, maxLikelihood: el.likelihood}); // als het nog niet voorkomt
+        }
+    });
+    for (var i = 1; i <= temp2.length; i++) {
+        sideEffects.push({
+            name: temp2[i - 1].name,
+            location: {
+                x: rectFromX - rectWidth/2,
+                y: (i) * (rectHeight + rBuffer) + sideEffectStart
+            },
+            likelihood: temp2[i - 1].likelihood,
+            maxLikelihood: temp2[i - 1].maxLikelihood
+        });
+    }
+}
+
 function initMedications(json) {
     pMedications = json.objects.filter(function (d) {
         return d.found
@@ -272,7 +357,7 @@ function initEpisodes(json) {
 
     for (var i = 0; i < temp2.length; i++) {
         var name = temp2[i];
-        var e = {name: name.replace("/", ""), location: {x: rectFromX, y: (i+1) * (rectHeight+rBuffer)}};
+        var e = {name: name.replace("/", ""), location: {x: rectFromX - rectWidth/2, y: (i+1) * (rectHeight+rBuffer)}};
         pEpisodes.push(e);
     }
 }
@@ -281,7 +366,7 @@ function initAllergies(json) {
     pAllergies = [];
     for (var i = 0; i < json.allergies.length; i++) {
         var name = json.allergies[i];
-        var e = {name: name.replace("/", ""), location: {x: rectFromX, y: height - (6 + 2 + 1 + i) * (rectHeight+rBuffer) + rBuffer}};
+        var e = {name: name.replace("/", ""), location: {x: rectFromX - rectWidth/2, y: height - (6 + 2 + 1 + i) * (rectHeight+rBuffer) + rBuffer}};
         pAllergies.push(e);
     }
 }
@@ -296,21 +381,21 @@ function visualizeConnections() {
         for (var i = 0; i < info.treats.length; i++) {
             pEpisodes.forEach(function (p) {
                 if (p.name.indexOf(info.treats[i]) > -1) {
-                    drawArrowFromTo(p, m, true, arrowColor);
+                    drawArrowFromTo(p, m, false, arrowColor);
                 }
             });
         }
         for (var i = 0; i < info.sideEffects.length; i++) {
             sideEffects.forEach(function (p) {
-                if (p.name.indexOf(info.sideEffects[i]) > -1) {
-                    drawArrowFromTo(m, p, true, negativeArrowColor);
+                if (p.name.indexOf(info.sideEffects[i].name) > -1) {
+                    drawArrowFromTo(m, p, false, hexColorWithSaturation(negativeArrowColor,info.sideEffects[i].likelihood));
                 }
             });
         }
         for (var i = 0; i < info.sideEffects.length; i++) {
             episodeAsSideEffects.forEach(function (p) {
-                if (p.name.indexOf(info.sideEffects[i]) > -1) {
-                    drawArrowFromTo(m, p, true, negativeArrowColor);
+                if (p.name.indexOf(info.sideEffects[i].name) > -1) {
+                    drawArrowFromTo(m, p, false, hexColorWithSaturation(negativeArrowColor,info.sideEffects[i].likelihood));
                 }
             });
         }
@@ -318,44 +403,50 @@ function visualizeConnections() {
             pAllergies.forEach(function (p) {
                 if (p.name.indexOf(info.allergies[i]) > -1) {
                     drawArrowFromTo(m, p, false, interactionColor);
+                    d3.select("#rect-"+ p.name).style("fill", interactionColor)
                 }
             });
         }
         var theight = height - rectHeight;
         if (+info.minAge > +pAge) {
             interactionsPresent = true;
-            drawArrowFromTo({
+            drawArrowFromTo(m,{
                 name: "age",
-                location: {x: rectFromX, y: theight - (2 * rectHeight) + rectHeight/2}
-            }, m, false, interactionColor);
+                location: {x: rectFromX - rectWidth/2, y: theight - (2 * rectHeight) + rectHeight/2}
+            }, false, interactionColor);
+            d3.select("#rect-age").style("fill", interactionColor)
         }
         if (+info.weight > +pWeight) {
             interactionsPresent = true;
-            drawArrowFromTo({
+            drawArrowFromTo(m,{
                 name: "weight",
-                location: {x: rectFromX, y: theight - (3 * rectHeight)+ rectHeight/2}
-            }, m, false, interactionColor);
+                location: {x: rectFromX - rectWidth/2, y: theight - (3 * rectHeight)+ rectHeight/2}
+            }, false, interactionColor);
+            d3.select("#rect-weight").style("fill", interactionColor)
         }
         if (!info.drivingAllowed) {
             interactionsPresent = true;
-            drawArrowFromTo({
+            drawArrowFromTo(m,{
                 name: "driving",
-                location: {x: rectFromX, y: theight - (4 * rectHeight)+ rectHeight/2}
-            }, m, false, interactionColor);
+                location: {x: rectFromX - rectWidth/2, y: theight - (4 * rectHeight)+ rectHeight/2}
+            }, false, interactionColor);
+            d3.select("#rect-driving").style("fill", interactionColor)
         }
         if (pGender === "FEMALE" && info.pregnant === false) {
             interactionsPresent = true;
-            drawArrowFromTo({
+            drawArrowFromTo(m,{
                 name: "pregnant",
-                location: {x: rectFromX, y: theight - (5 * rectHeight)+ rectHeight/2}
-            }, m, false, interactionColor);
+                location: {x: rectFromX - rectWidth/2, y: theight - (5 * rectHeight)+ rectHeight/2}
+            }, false, interactionColor);
+            d3.select("#rect-pregnant").style("fill", interactionColor)
         }
         if (pGender === "FEMALE" && info.breastfeeding === false) {
             interactionsPresent = true;
-            drawArrowFromTo({
+            drawArrowFromTo(m,{
                 name: "breastfeeding",
-                location: {x: rectFromX, y: theight - (6 * rectHeight)+ rectHeight/2}
-            }, m, false, interactionColor);
+                location: {x: rectFromX - rectWidth/2, y: theight - (6 * rectHeight)+ rectHeight/2}
+            }, false, interactionColor);
+            d3.select("#rect-breastfeeding").style("fill", interactionColor)
         }
     });
 }
@@ -364,12 +455,12 @@ function visualizeConnections() {
 
 
 
-function createBar(bar) {
+function createBar(bar, color) {
     bar.append("rect")
-        .attr("class", "personalRect")
+        .attr("id", function(d) { console.log(d); return "rect-" + d.name})
         .attr("width", rectWidth)
         .attr("height", rectHeight)
-        .style("fill", episodeColor);
+        .style("fill", color);
 }
 
 function createTextInBar(bar, textFunction) {
@@ -393,7 +484,7 @@ function visualizeEpisodes() {
             return "translate(" + d.location.x + ", " + d.location.y + ")";
         });
 
-    createBar(bar);
+    createBar(bar, arrowColor);
     createTextInBar(bar, function(d) {
         return d.name;
     });
@@ -411,7 +502,7 @@ function visualizeAllergies() {
             return "translate(" + d.location.x + ", " + d.location.y + ")";
         });
 
-    createBar(bar);
+    createBar(bar, episodeColor);
     createTextInBar(bar, function(d) {
         return d.name;
     });
@@ -426,7 +517,7 @@ function visualizeSideEffects() {
             return "translate(" + d.location.x + ", " + d.location.y + ")";
         });
 
-    createBar(bar);
+    createBar(bar, function(d) {return hexColorWithSaturation(negativeArrowColor, d.maxLikelihood)});
     createTextInBar(bar, function (d, i) {
         return d.name;
     });
@@ -437,29 +528,29 @@ function visualizePersonal() {
     var bar = upperLayer.selectAll(".personal")
         .data(function () {
             if (pGender === "MALE") {
-                return [pAge, pWeight, "driving"];
+                return [{name: "age", value: pAge}, {name: "weight", value: pWeight}, {name: "driving", value: "driving"}];
             } else {
-                return [pAge, pWeight, "driving", "pregnant", "breastfeeding"]
+                return [{name: "age", value: pAge}, {name: "weight", value: pWeight}, {name: "driving", value: "driving"} , {name: "pregnant", value: "pregnant"}, {name: "breastfeeding", value: "breastfeeding"}]
             }
         })
         .enter().append("g")
         .attr("class", "personal")
         .attr("transform", function (d, i) {
-            return "translate(" + rectFromX + ", " + (theight - (i+1)*(rectHeight + rBuffer)) + ")";
+            return "translate(" + (rectFromX - rectWidth/2) + ", " + (theight - (i+1)*(rectHeight + rBuffer)) + ")";
         });
 
     var textFunction = function (d, i) {
         switch (i) {
             case 0:
-                return "age: " + d + " years";
+                return "age: " + d.value + " years";
             case 1:
-                return "weight: " + d + " kg";
+                return "weight: " + d.value + " kg";
             default:
-                return d;
+                return d.name;
         }
     };
 
-    createBar(bar);
+    createBar(bar, episodeColor);
     createTextInBar(bar,textFunction);
 }
 
@@ -481,6 +572,11 @@ function visualizeInteractions() {
 
 
 function drawArrowFromTo(object0, object1, arrow, color) {
+    if (object0.center == undefined && object1.center !== undefined) {
+        var temp =  object0;
+        object0 = object1;
+        object1 = temp;
+    }
     var startPoint  = object0.center;
     if(startPoint == undefined) {
         startPoint = {x: object0.location.x + rectWidth, y: object0.location.y + rectHeight/2}
@@ -490,7 +586,13 @@ function drawArrowFromTo(object0, object1, arrow, color) {
         endPoint = {x: object1.location.x + rectWidth, y: object1.location.y + rectHeight/2}
     }
 
-    var lineData = [{x: startPoint.x, y: startPoint.y}, {x: endPoint.x, y: endPoint.y}];
+    var lineData = [];
+    if(startPoint.x > endPoint.x) {
+        lineData = [{x: startPoint.x, y: startPoint.y}, {x: endPoint.x, y: endPoint.y}];
+    } else {
+        lineData = [{x: endPoint.x - rectWidth, y: endPoint.y}, {x: startPoint.x , y: startPoint.y}];
+    }
+
 
     var extraPoints = interceptOnCircle(startPoint,endPoint, object0, object1);
     extraPoints.forEach(function(p) {
@@ -499,19 +601,12 @@ function drawArrowFromTo(object0, object1, arrow, color) {
         lineData.push(temp);
     });
 
-    var lineGraph = lowerLayer.append("path")
+    lowerLayer.append("path")
         .attr("class", "arrow")
         .attr("d", lineFunction(lineData))
         .attr("stroke", color)
         .attr("stroke-width", interactionLineWidth)
-        .attr("fill", "none")
-        .attr("marker-end", function() {
-            if(arrow && startPoint.x > endPoint.x) {
-                return "url(#negativearrowhead)";
-            } else if (arrow) {
-                return "url(#arrowhead)";
-            }
-        });
+        .attr("fill", "none");
 }
 
 
@@ -521,11 +616,12 @@ function interceptOnCircle(p1,p2, o1,o2){
     var P = SAT.Polygon;
 
     var points = [];
+    var polygon = new P(new V(0, 0), [new V(p1.x, p1.y), new V(p2.x, p2.y)]);
+
     pMedications.forEach(function(med) {
         var c = med.center;
-        var r = (getInnerSize(med)/2) + (15 * (rWidth + rBuffer));
+        var r = (getInnerSize(med)/2) + (5*(rWidth + rBuffer));
         var circle = new C(new V(c.x, c.y), (r-1)); // not the two original circles
-        var polygon = new P(new V(0,0), [new V(p1.x,p1.y),new V(p2.x,p2.y)]);
         var response = new SAT.Response();
         var collided = SAT.testPolygonCircle(polygon, circle, response);
 
@@ -533,6 +629,14 @@ function interceptOnCircle(p1,p2, o1,o2){
             points.push({x: c.x - (r/response.overlap)*response.overlapV.x, y: c.y - (r/response.overlap)*response.overlapV.y});
         }
     });
+
+    // Test rectangle in the middle part
+    var boxes = new P(new V(0, 0), [new V(rectFromX, (rectHeight+2*rBuffer) * (pEpisodes.length + sideEffects.length)), new V(rectFromX, 0)]);
+    var response = new SAT.Response();
+    var collided = SAT.testPolygonPolygon(boxes, polygon, response);
+    if (collided && o1.center && o2.center) { // TODO vuile hack
+        points.push({x: width/2, y: 1.2 * (rectHeight+2*rBuffer) * (pEpisodes.length + sideEffects.length)});
+    }
 
     // depends on the direction
     points.sort(function(a,b) {
@@ -618,7 +722,7 @@ function visualizeMedications() {
             .attr("y", -getInnerSize(medBox)/2.1)
             .attr("dy", ".7em")
             .attr("text-anchor", "middle")
-            .style("fill", posologyColor)
+            .style("fill", episodeTextColor)
             .style("font-size", auxTextFont)
             .style("stroke", bodyBackgroundColor)
             .style("stroke-width", textStrokeWidth)
@@ -632,7 +736,7 @@ function visualizeMedications() {
             .attr("y", getInnerSize(medBox)/2.1)
             .attr("dy", "-.35em")
             .attr("text-anchor", "middle")
-            .style("fill", posologyColor)
+            .style("fill", episodeTextColor)
             .style("font-size", auxTextFont)
             .style("stroke", bodyBackgroundColor)
             .style("stroke-width", textStrokeWidth)
@@ -646,7 +750,7 @@ function visualizeMedications() {
             .attr("y", 0)
             .attr("dx", "-.7em")
             .attr("text-anchor", "middle")
-            .style("fill", posologyColor)
+            .style("fill", episodeTextColor)
             .style("font-size", auxTextFont)
             .style("stroke", bodyBackgroundColor)
             .style("stroke-width", textStrokeWidth)
@@ -660,7 +764,7 @@ function visualizeMedications() {
             .attr("y", 0)
             .attr("dx", ".7em")
             .attr("text-anchor", "middle")
-            .style("fill", posologyColor)
+            .style("fill", episodeTextColor)
             .style("font-size", auxTextFont)
             .style("stroke", bodyBackgroundColor)
             .style("stroke-width", textStrokeWidth)
@@ -758,67 +862,74 @@ function visualizeMedications() {
         var endMonthNumber = +(endDate.toString('M'));
         var startWeekDay = medInfo.weekday !== undefined && eval("startDate.next()." + medInfo.weekday + "()");
         var nbMonths = endMonthNumber - startMonthNumber + 1;
-        if(nbMonths < 0) {
+        if (nbMonths < 0) {
             nbMonths = 12 - startMonthNumber + endMonthNumber + 1;
+        }
+        var lifetime = +endDate.toString("yyyy") < +startDate.toString("yyyy");
+        if(lifetime) {
+            nbMonths = 1;
+            startDate = Date.parse("2015-01-01");
+            endDate = Date.parse("2015-01-31");
+            startMonthNumber = 1;
         }
 
         d3.select("#" + medBox.name + "-arcpath" + i).remove();
 
-        console.log(nbMonths);
-        for(var i = 0; i < nbMonths; i++) {
-            var monthIndex = (startMonthNumber + i - 1)%12;
-            var innerRadius = getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer));
+        for (var i = 0; i < nbMonths; i++) {
+            var innerRadius = getInnerSize(medBox) / 2 + ((i + 1) * (rWidth + rBuffer));
+            var monthIndex = lifetime ? 12 : (startMonthNumber + i - 1) % 12;
             var path = d3.select("#" + medBox.name)
                 .append("path")
                 .attr("id", medBox.name + "-arcpath" + i)
                 .attr("class", "period_arc")
                 .style("fill", "none")
-                .attr("d", innerArc(innerRadius, -0.1*Math.PI,0)(medBox));
+                .attr("d", innerArc(innerRadius, -0.1 * Math.PI, 0)(medBox));
 
             medSvg.append("text")
-                .attr("dy",rWidth/2 + 4)
+                .attr("dy", rWidth / 2 + 4)
                 .append("textPath") //append a textPath to the text element
-                .attr("xlink:href", "#" + medBox.name + "-arcpath"+i) //place the ID of the path here
+                .attr("xlink:href", "#" + medBox.name + "-arcpath" + i) //place the ID of the path here
                 .attr("text-anchor", "end")
                 .attr("startOffset", "42%")
                 .attr("fill", episodeTextColor)
                 .text(MONTH_NAMES[monthIndex]);
 
             var daysInMonth = MONTH_NB_DAYS[monthIndex];
-            var endAngle = daysInMonth/31 * 1.9*Math.PI;
-            createPosArc(medBox,innerRadius, 0, endAngle,periodBackgroundColor);
+            var endAngle = daysInMonth / 31 * 1.9 * Math.PI;
 
-            if(!startWeekDay && i !== nbMonths-1) {
-                if(i === 0) {
-                    createPosArc(medBox,innerRadius, (startDate.getDate() / daysInMonth) * endAngle, endAngle,periodColor);
+            createPosArc(medBox, innerRadius, 0, endAngle, lifetime ? lifetimeBackgroundColor : periodBackgroundColor);
+
+            if (!startWeekDay && i !== nbMonths - 1) {
+                if (i === 0) {
+                    createPosArc(medBox, innerRadius, (startDate.getDate() / daysInMonth) * endAngle, endAngle, lifetime ? lifetimeColor : periodColor);
                 } else {
-                    createPosArc(medBox,innerRadius, 0, endAngle,periodColor);
+                    createPosArc(medBox, innerRadius, 0, endAngle, lifetime ? lifetimeColor : periodColor);
                 }
             } else {
-                if(!startWeekDay) {
-                    if(i === 0) {
-                        createPosArc(medBox,innerRadius, (startDate.getDate() / daysInMonth) * endAngle, (endDate.getDate() / daysInMonth) * endAngle, periodColor);
+                if (!startWeekDay) {
+                    if (i === 0) {
+                        createPosArc(medBox, innerRadius, ((startDate.getDate()-1) / daysInMonth) * endAngle, (endDate.getDate() / daysInMonth) * endAngle, lifetime ? lifetimeColor : periodColor);
                     } else {
-                        createPosArc(medBox,innerRadius, 0, (endDate.getDate() / daysInMonth) * endAngle, periodColor);
+                        createPosArc(medBox, innerRadius, 0, (endDate.getDate() / daysInMonth) * endAngle, lifetime ? lifetimeColor : periodColor);
                     }
                 } else {
-                   // TODO juiste vakjes kleuren
-                    createPosArc(medBox,innerRadius, 0, endAngle,periodBackgroundColor);
+                    // TODO juiste vakjes kleuren
+                    createPosArc(medBox, innerRadius, 0, endAngle, lifetime ? lifetimeBackgroundColor : periodBackgroundColor);
                     for (var k = 0; k < 5; k++) {
-                        if (startWeekDay.between(startDate,endDate) && +(startWeekDay.toString('M')) === (startMonthNumber+i)) {
+                        if (startWeekDay.between(startDate, endDate) && +(startWeekDay.toString('M')) === (startMonthNumber + i)) {
                             createPosArc(
                                 medBox,
                                 innerRadius,
                                 ((startWeekDay.getDate() - 1) / daysInMonth) * endAngle,
                                 ((startWeekDay.getDate()) / daysInMonth) * endAngle,
-                                periodColor
+                                lifetime ? lifetimeColor : periodColor
                             );
                             startWeekDay.addWeeks(1);
                         }
                     }
                 }
             }
-            for (var j = 0; j < daysInMonth; j++) {
+            for (var j = 0; j < daysInMonth && !lifetime; j++) {
                 createPosArc(medBox,
                     innerRadius,
                     ((j - 0.01) / daysInMonth) * endAngle,
@@ -844,7 +955,7 @@ function visualizeMedications() {
                 }
             }
         }
-        
+
         // TODO data in orde maken en dan tutorial volgen --> animaties voor later
         //var periodData = [];
         //for(var i = 0; i < nbMonths; i++) {
@@ -857,153 +968,7 @@ function visualizeMedications() {
         //}
 
 
-        //createCircle(medBox, getInnerSize(medBox)/2 + rWidth + rBuffer, periodBackgroundColor);
-        //
-        //var startDate = Date.parse(medInfo.startDate);
-        //var endDate = Date.parse(medInfo.endDate);
-        //
-        //var nbMonths = (+(endDate.toString('M')) - +(startDate.toString('M'))) + 1;
-        //var angle = τ / (new Date(startDate.getYear(), +(startDate.toString('M')), 0).getDate());
-        //var startWeekDay = medInfo.weekday !== undefined && eval("startDate.next()." + medInfo.weekday + "()");
-        //
-        //if (nbMonths === 1) {
-        //    var innerRadius = getInnerSize(medBox)/2 + rWidth + rBuffer;
-        //    createCircle(
-        //        medBox,
-        //        innerRadius,
-        //        periodBackgroundColor
-        //    );
-        //    if (!startWeekDay) {
-        //        createPosArc(
-        //            medBox,
-        //            innerRadius,
-        //            startDate.getDate() * angle,
-        //            (endDate.getDate()+1) * angle,
-        //            periodColor
-        //        );
-        //    } else {
-        //        var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
-        //        for (var j = 0; j < nbWeeks; j++) {
-        //            createPosArc(
-        //                medBox,
-        //                innerRadius,
-        //                startWeekDay.getDate() * angle,
-        //                (startWeekDay.getDate() + 1) * angle,
-        //                periodColor
-        //            );
-        //            startWeekDay.addWeeks(1);
-        //        }
-        //    }
-        //    var daysInThisMonth = daysInMonth(startDate);
-        //    for(var i = 0; i < daysInThisMonth; i++) {
-        //        createPosArc(medBox,
-        //            innerRadius,
-        //            ((i-0.01) / daysInThisMonth) * τ,
-        //            ((i+0.01) / daysInThisMonth) * τ,
-        //            periodColor);
-        //        d3.select("#" + medBox.name)
-        //            .append("text")
-        //            .attr("class", "auxtext")
-        //            .attr("x", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.cos((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-        //            .attr("y", (getInnerSize(medBox)/2 + 2.5*(rWidth + rBuffer)) * -Math.sin((((i+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-        //            .attr("text-anchor", "middle")
-        //            .style("fill", periodColor)
-        //            .style("font-size", auxTextFont)
-        //            .style("text-anchor", "middle")
-        //            .attr("dy", ".3em")
-        //            .style("stroke", bodyBackgroundColor)
-        //            .style("stroke-width", textStrokeWidth)
-        //            .style("stroke-linejoin", "round")
-        //            .style("paint-order", "stroke")
-        //            .text(i+1);
-        //    }
-        //} else {
-        //    for (var i = 0; i < nbMonths - 1; i++) {
-        //        if (!startWeekDay) {
-        //            createCircle(
-        //                medBox,
-        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-        //                periodColor);
-        //        } else {
-        //            createCircle(
-        //                medBox,
-        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-        //                periodBackgroundColor);
-        //            for (var j = 0; j < 5; j++) {
-        //                if (+(startWeekDay.toString('M')) === (new Date(medInfo.startDate).getMonth() + (i))) {
-        //                    createPosArc(
-        //                        medBox,
-        //                        getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-        //                        startWeekDay.getDate() * angle,
-        //                        (startWeekDay.getDate() + 1) * angle,
-        //                        periodColor
-        //                    );
-        //                    startWeekDay.addWeeks(1);
-        //                }
-        //            }
-        //        }
-        //
-        //        var daysInThisMonth = daysInMonth(startWeekDay);
-        //        for(var j = 0; j < daysInThisMonth; j++) {
-        //            createPosArc(medBox,
-        //                getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-        //                ((j-0.01) / daysInThisMonth) * τ,
-        //                ((j+0.01) / daysInThisMonth) * τ,
-        //                periodColor);
-        //        }
-        //
-        //    }
-        //    // laatste maand
-        //    createCircle(
-        //        medBox,
-        //        getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
-        //        periodBackgroundColor
-        //    );
-        //    if (!startWeekDay) {
-        //        createPosArc(
-        //            medBox,
-        //            getInnerSize(medBox)/2 + (nbMonths * (rWidth + rBuffer)),
-        //            0,
-        //            (endDate.getDate() + 1) * angle,
-        //            periodColor
-        //        );
-        //    } else {
-        //        var nbWeeks = 1 + Math.floor(Math.abs((+endDate) - (+startWeekDay)) / (7 * 8.64e7));
-        //        for (var j = 0; j < nbWeeks; j++) {
-        //            createPosArc(
-        //                medBox,
-        //                getInnerSize(medBox)/2 + ((nbMonths) * (rWidth + rBuffer)),
-        //                (startWeekDay.getDate() - 1) * angle,
-        //                ((startWeekDay.getDate() - 1) + 1) * angle,
-        //                periodColor
-        //            );
-        //            startWeekDay.addWeeks(1);
-        //        }
-        //    }
-        //    var daysInThisMonth = daysInMonth(endDate)
-        //    for(var j = 0; j < daysInThisMonth; j++) {
-        //        createPosArc(medBox,
-        //            getInnerSize(medBox)/2 + ((i + 1) * (rWidth + rBuffer)),
-        //            ((j-0.01) / daysInThisMonth) * τ,
-        //            ((j+0.01) / daysInThisMonth) * τ,
-        //            periodColor);
-        //
-        //        d3.select("#" + medBox.name)
-        //            .append("text")
-        //            .attr("class", "auxtext")
-        //            .attr("x", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.cos((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-        //            .attr("y", (getInnerSize(medBox)/2 + ((nbMonths+1.5) * (rWidth + rBuffer))) * -Math.sin((((j+0.5) / daysInThisMonth) * τ) + Math.PI/2 ))
-        //            .style("fill", periodColor)
-        //            .style("font-size", auxTextFont)
-        //            .style("text-anchor", "middle")
-        //            .attr("dy", ".3em")
-        //            .style("stroke", bodyBackgroundColor)
-        //            .style("stroke-width", textStrokeWidth)
-        //            .style("stroke-linejoin", "round")
-        //            .style("paint-order", "stroke")
-        //            .text(j+1);
-        //    }
-        //}
+
     }
 
     /**
@@ -1082,4 +1047,66 @@ function locationToMedCenter(medBox) {
  */
 function getMedicationInfo(medicationName) {
     return medicationInfo.filter(function(m) {return m.name === medicationName})[0];
+}
+
+
+function hexColorWithSaturation(hex, percent) {
+    if (!/^#([0-9a-f]{6})$/i.test(hex)) {
+        throw('Unexpected color format');
+    }
+
+    var realPercent;
+    switch (percent) {
+        case "zeer vaak":
+            realPercent = 100;
+            break;
+        case "vaak":
+            realPercent = 75;
+            break;
+        case "soms":
+            realPercent = 45;
+            break;
+        case "zelden":
+            realPercent = 20;
+            break;
+        default :
+            console.log(percent);
+    }
+    percent = realPercent;
+
+    var r       = parseInt(hex.substr(1,2), 16),
+        g       = parseInt(hex.substr(3,2), 16),
+        b       = parseInt(hex.substr(5,2), 16),
+        sorted  = [r, g, b].sort(function(a, b){return a-b;}),
+        min     = sorted[0],
+        med     = sorted[1],
+        max     = sorted[2];
+
+    if (min == max) {
+        // has no color
+        return hex;
+    }
+
+    var max2    = max,
+        rel     = (max-med)/(med-min),
+        min2    = max/100 * (100-percent),
+        med2    = isFinite(rel) ? (rel * min2 + max2) / (rel + 1) : min2,
+        int2hex = function(int) { return ('0' + int.toString(16)).substr(-2); },
+        rgb2hex = function(rgb) { return '#' + int2hex(rgb[0]) + int2hex(rgb[1]) + int2hex(rgb[2]); },
+        hex2;
+
+    min2 = Math.round(min2);
+    med2 = Math.round(med2);
+
+    if (r == min) {
+        hex2 = rgb2hex( g==med ? [min2, med2, max2] : [min2, max2, med2] );
+    }
+    else if (r == med) {
+        hex2 = rgb2hex( g == max ? [med2, max2, min2] : [med2, min2, max2] );
+    }
+    else {
+        hex2 = rgb2hex( g == min ? [max2, min2, med2] : [max2, med2, min2] );
+    }
+
+    return hex2;
 }

@@ -14,19 +14,19 @@
       "pathName": "data/aspirine.png",
       "found": true,
       "leftUp": {
-        "x": 744,
+        "x": 344,
         "y": 397
       },
       "leftDown": {
-        "x": 744,
+        "x": 344,
         "y": 505
       },
       "rightUp": {
-        "x": 934,
+        "x": 534,
         "y": 395
       },
       "rightDown": {
-        "x": 932,
+        "x": 532,
         "y": 502
       }
     },
@@ -36,19 +36,19 @@
       "found": true,
       "leftUp": {
         "x": 1391,
-        "y": 389
+        "y": 589
       },
       "leftDown": {
         "x": 1400,
-        "y": 656
+        "y": 856
       },
       "rightUp": {
         "x": 1549,
-        "y": 393
+        "y": 593
       },
       "rightDown": {
         "x": 1549,
-        "y": 639
+        "y": 839
       }
     },
     {
@@ -71,41 +71,20 @@
       "pathName": "data/lysox.png",
       "found": true,
       "leftUp": {
-        "x": 1125,
-        "y": 89
+        "x": 1525,
+        "y": 189
       },
       "leftDown": {
-        "x": 1107,
-        "y": 230
+        "x": 1507,
+        "y": 330
       },
       "rightUp": {
-        "x": 1327,
-        "y": 115
+        "x": 1757,
+        "y": 215
       },
       "rightDown": {
-        "x": 1312,
-        "y": 254
-      }
-    },
-    {
-      "name": "motilium",
-      "pathName": "data/motilium.png",
-      "found": true,
-      "leftUp": {
-        "x": 346,
-        "y": 334
-      },
-      "leftDown": {
-        "x": 343,
-        "y": 434
-      },
-      "rightUp": {
-        "x": 510,
-        "y": 334
-      },
-      "rightDown": {
-        "x": 513,
-        "y": 435
+        "x": 1712,
+        "y": 354
       }
     },
     {

@@ -1,0 +1,247 @@
+[
+  {
+    "name": "sinutab",
+    "treats": ["cold", "nasal congestion", "Oesophagus disease"],
+    "maxDays": 5,
+    "startDate": "2015-10-04",
+    "endDate": "2015-12-23",
+    "posology": {
+      "hoursInBetween": 4,
+      "dailyAmount": 3,
+      "completely": true
+    },
+    "sideEffects": [{"name":"nausea", "likelihood": "zelden"},{"name":"vomitting", "likelihood": "soms"}],
+    "breastfeeding": true,
+    "pregnant": true,
+    "drivingAllowed": true,
+    "minAge": 12,
+    "weight": 0,
+    "interactions" : ["amoxicilline"],
+    "allergies": []
+
+  },
+  {
+    "name": "dcure",
+    "treats": ["low vitamine D", "artrose"],
+    "maxDays": 0,
+    "startDate": "2015-11-05",
+    "endDate": "2015-12-15",
+    "posology": {
+      "hoursInBetween": 0,
+      "dailyAmount": 10,
+      "completely": true
+    },
+    "sideEffects": [{"name":"sensitivity", "likelihood": "vaak"}],
+    "breastfeeding": "undefined",
+    "pregnant": "undefined",
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : [],
+    "allergies": []
+  },
+  {
+    "name": "lysox",
+    "treats": ["bronchitis", "mucovisvidose", "nasal congestion"],
+    "maxDays": 0,
+    "startDate": "2015-11-10",
+    "endDate": "2016-01-01",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 1,
+      "completely": true
+    },
+    "sideEffects": [{"name":"gastro-intestinal disorders", "likelihood": "zelden"},{"name":"rash", "likelihood": "soms"}],
+    "breastfeeding": true,
+    "pregnant": true,
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["aspirine"],
+    "allergies": []
+  },
+  {
+    "name": "amoxicilline",
+    "treats": ["cold", "nasal congestion"],
+    "maxDays": 0,
+    "startDate": "2015-11-05",
+    "endDate": "2015-12-10",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 2,
+      "completely": true
+    },
+    "sideEffects": ["sensitivity"],
+    "breastfeeding": "undefined",
+    "pregnant": "undefined",
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["sinutab","allopurinol", "methotrextraat", "digoxine", "anticoagulantia","de pil", "dcure"],
+    "allergies": ["penicillinen", "cefalosporinen"]
+  },
+  {
+    "name": "nietjes",
+    "treats": ["headache"],
+    "maxDays": 0,
+    "startDate": "2015-08-02",
+    "endDate": "2015-10-01",
+    "weekday": "tuesday",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 1,
+      "completely": true
+    },
+    "sideEffects": [{"name":"dizziness", "likelihood": "vaak"}, {"name":"stiffness", "likelihood": "vaak"},{"name":"diarrhea", "likelihood": "vaak"}],
+    "breastfeeding": "undefined",
+    "pregnant": "undefined",
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["allopurinol", "methotrextraat", "digoxine", "anticoagulantia","de pil", "sinutab"],
+    "allergies": ["penicillinen", "cefalosporinen"]
+  },
+  {
+    "name": "paracetamol",
+    "treats": ["headache"],
+    "maxDays": 0,
+    "startDate": "2015-08-15",
+    "endDate": "2015-8-17",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 3,
+      "completely": true
+    },
+    "sideEffects": [{"name":"sensitivity", "likelihood": "vaak"}],
+    "breastfeeding": "undefined",
+    "pregnant": "undefined",
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["allopurinol", "methotrextraat", "digoxine", "anticoagulantia","de pil"],
+    "allergies": ["penicillinen", "cefalosporinen"]
+  },
+  {
+    "name": "zoetjes",
+    "treats": ["Neoplasm digestive system benign", "Oesophagus disease", "Stomach function disorder"],
+    "maxDays": 0,
+    "startDate": "2015-11-09",
+    "endDate": "2015-11-16",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 4,
+      "completely": true
+    },
+    "sideEffects": [{"name":"sensitivity", "likelihood": "vaak"},{"name":"headache", "likelihood": "vaak"}],
+    "breastfeeding": "undefined",
+    "pregnant": "undefined",
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["allopurinol", "methotrextraat", "digoxine", "anticoagulantia","de pil","dcure"],
+    "allergies": ["penicillinen", "cefalosporinen"]
+  },
+  {
+    "name": "colludul",
+    "treats": ["angina","faryngitis", "mouth ulcers"],
+    "maxDays": 0,
+    "startDate": "2015-11-10",
+    "endDate": "2015-12-10",
+    "posology": {
+      "hoursInBetween": 4,
+      "dailyAmount": 6,
+      "completely": true
+    },
+    "sideEffects": [{"name":"nausea", "likelihood": "soms"},
+      {"name":"headache", "likelihood": "vaak"},
+      {"name":"flurry", "likelihood": "vaak"},{"name":"tremors", "likelihood": "zeer vaak"}  ],
+    "breastfeeding": true,
+    "pregnant": true,
+    "drivingAllowed": true,
+    "minAge": 6,
+    "weight": 0,
+    "interactions" : [],
+    "allergies": ["hexamidine"]
+  },
+  {
+    "name": "aspirine",
+    "treats": ["pain","fever", "cold"],
+    "maxDays": 0,
+    "startDate": "2015-11-05",
+    "endDate": "2016-01-20",
+    "posology": {
+      "hoursInBetween": 4,
+      "dailyAmount": 6,
+      "completely": true
+    },
+    "sideEffects": [{"name":"gastro-intestinal disorders", "likelihood": "vaak"},{"name":"stomach ulcers", "likelihood": "zeer vaak"}, {"name":"blood loss in stool", "likelihood": "zelden"}],
+    "breastfeeding": true,
+    "pregnant": true,
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["acetylsalicylzuur","heparine"],
+    "allergies": ["asthma"]
+  },
+  {
+    "name": "ibuprofen",
+    "treats": ["inflammation","stiffness"],
+    "maxDays": 0,
+    "startDate": "2015-08-18",
+    "endDate": "2015-08-20",
+    "posology": {
+      "hoursInBetween": 5,
+      "dailyAmount": 2,
+      "completely": true
+    },
+    "sideEffects": [{"name":"sensitivity", "likelihood": "vaak"},{"name":"headache", "likelihood": "vaak"}],
+    "breastfeeding": true,
+    "pregnant": true,
+    "drivingAllowed": true,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : ["aspirine", "nietjes"],
+    "allergies": ["skin", "cefalosporinen"]
+  },
+  {
+    "name": "motilium",
+    "treats": ["nausea","vomiting"],
+    "maxDays": 0,
+    "startDate": "2015-11-01",
+    "endDate": "2015-12-30",
+    "weekday": "wednesday",
+    "posology": {
+      "hoursInBetween": 6,
+      "dailyAmount": 4,
+      "completely": true
+    },
+    "sideEffects": [{"name":"hormones", "likelihood": "zelden"}],
+    "breastfeeding": false,
+    "pregnant": false,
+    "drivingAllowed": true,
+    "minAge": 12,
+    "weight": 35,
+    "interactions" : ["ketoconazole"],
+    "allergies": ["ampicillin"]
+  },
+  {
+    "name": "dormiplant",
+    "treats": ["sleep"],
+    "maxDays": 0,
+    "startDate": "2015-11-10",
+    "endDate": "2015-11-30",
+    "posology": {
+      "hoursInBetween": 8,
+      "dailyAmount": 3,
+      "completely": true
+    },
+    "sideEffects": [{"name":"nausea", "likelihood": "zelden"}],
+    "breastfeeding": false,
+    "pregnant": false,
+    "drivingAllowed": false,
+    "minAge": 0,
+    "weight": 0,
+    "interactions" : [],
+    "allergies": []
+  }
+]

@@ -39,8 +39,8 @@ var auxTextFont = 14,
 //    lifetimeColor = "#69d094",
 //    lifetimeBackgroundColor = "#c3ecd4";
 
-var initialBodyBackgroundColor = "white",
-    dangerBackgroundColor ="black"
+var initialBodyBackgroundColor = "black",
+    dangerBackgroundColor = "#f3bbbb",
     posologyColor = "#a9aa1e",
     posologyBackgroundColor = "#ebeb91",
     periodColor = " #ff7f0e",
@@ -115,14 +115,14 @@ var lineFunction = d3.svg.line()
     .y(function(d) { return d.y; })
     .interpolate("basis"); // basis
 
-d3.json("testdata/medicationInfo.json", function(error, json) {
+d3.json("achg/interaction.json", function(error, json) {
     medicationInfo = json;
 });
 
 function update() {
     //d3.json("http://localhost:4567/json", function(error, json) {
     //d3.json("testdata/locations.json", function(error, json) {
-    d3.json("testdata/motilium-aspirine-lysox-colludul-acetylcysteine.json", function(error, json) {
+    d3.json("achg/aspirine-lysox-colludul.json", function(error, json) {
         if (error) return console.warn(error);
         if (json.errorType != "NONE") return console.warn(json.errorType);
 

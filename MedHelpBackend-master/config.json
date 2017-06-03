@@ -1,0 +1,8 @@
+{
+  "patientID": "C_2406",
+  "visualOutput": true,
+  "username": "myhealthdata",
+  "password": "wMX75YPMFESnxZJA",
+  "databaseURL": "davinci.cs.kuleuven.be/myhealthdata"
+  //  "databaseURL": "localhost:3306/myhealthdata"
+}
